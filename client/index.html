@@ -1,9 +1,13 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>Live Code Share</title>
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Code Share - Real-time Collaborative Editor</title>
+    <meta
+      name="description"
+      content="Real-time collaborative code editor with multiple language support"
+    />
     <link rel="stylesheet" href="./css/app.css" />
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
   </head>
@@ -11,16 +15,26 @@
     <div id="lobby" class="lobby">
       <div class="lobby-card">
         <h1>Live Code Share</h1>
-        <p class="sub">Realtime collaborative editor</p>
+        <p class="sub">Real-time collaborative code editor</p>
 
         <div class="room-actions">
-          <button id="createRoomBtn">Create new room</button>
+          <button id="createRoomBtn">Create New Room</button>
 
           <div class="join-box">
-            <input id="roomInput" placeholder="Enter room code" />
-            <button id="joinRoomBtn">Join</button>
+            <input
+              id="roomInput"
+              type="text"
+              placeholder="Enter 6-digit room code"
+              maxlength="6"
+              autocomplete="off"
+            />
+            <button id="joinRoomBtn">Join Room</button>
           </div>
         </div>
+
+        <p class="sub" style="margin-top: 20px; font-size: 12px">
+          Share the room code with others to collaborate
+        </p>
       </div>
     </div>
 
@@ -29,12 +43,25 @@
         <div class="brand">Live Code Share</div>
 
         <div class="controls">
-          <select id="languageSelect"></select>
-          <span id="roomLabel"></span>
+          <div class="connection-status" id="connectionStatus">
+            <span class="status-dot"></span>
+            <span class="status-text">Connecting...</span>
+          </div>
+
+          <select
+            id="languageSelect"
+            title="Select programming language"
+          ></select>
+
+          <div id="roomLabel" title="Room code"></div>
         </div>
       </header>
 
       <main id="editor"></main>
+
+      <div id="peersSidebar" class="peers-sidebar hidden">
+        <div id="peersList"></div>
+      </div>
     </div>
 
     <script src="./js/editor.js"></script>
