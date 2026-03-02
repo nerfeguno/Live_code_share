@@ -1,8 +1,5 @@
-import { initializeEditor, setEditorLanguage, getEditorContent, setEditorContent } from './editor.js';
-
 let socket;
 let roomId = null;
-let editorReady = false;
 
 const lobby = document.getElementById("lobby");
 const app = document.getElementById("app");
@@ -14,32 +11,42 @@ const languageSelect = document.getElementById("languageSelect");
 document.getElementById("createRoomBtn").addEventListener("click", createRoom);
 document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
 languageSelect.addEventListener("change", () => {
-    setEditorLanguage(languageSelect.value);
+    Editor.setEditorLanguage(languageSelect.value);
 });
 
-async function createRoom() {
+function createRoom() {
     socket = new WebSocket("wss://live-code-share-ld0g.onrender.com");
-    await setupEditorAndSocket();
     socket.addEventListener("open", () => {
         socket.send(JSON.stringify({ type: "create" }));
     });
+    setupSocket();
 }
 
-async function joinRoom() {
+function joinRoom() {
     roomId = roomIdInput.value.trim();
     if (!roomId) return alert("Enter Room ID");
     socket = new WebSocket("wss://live-code-share-ld0g.onrender.com");
-    await setupEditorAndSocket();
     socket.addEventListener("open", () => {
         socket.send(JSON.stringify({ type: "join", room: roomId }));
     });
+    setupSocket();
 }
 
-async function setupEditorAndSocket() {
-    if (!editorReady) {
-        await initializeEditor(languageSelect.value);
-        editorReady = true;
-    }
+function setupSocket() {
+    Editor.initializeEditor(languageSelect.value).then(() => {
+        if (Editor.getEditorContent) {
+            setInterval(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: "code-update",
+                        room: roomId,
+                        code: Editor.getEditorContent(),
+                        sender: socket.id
+                    }));
+                }
+            }, 500);
+        }
+    });
 
     socket.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
@@ -47,25 +54,14 @@ async function setupEditorAndSocket() {
             roomId = data.room;
             enterRoom();
         } else if (data.type === "room-joined") {
-            roomId = data.room;
             enterRoom();
-        } else if (data.type === "code-update") {
-            setEditorContent(data.code);
+        } else if (data.type === "code-update" && data.sender !== socket.id) {
+            Editor.setEditorContent(data.code);
         }
     });
 
     socket.addEventListener("open", () => updateConnectionStatus("connected"));
     socket.addEventListener("close", () => updateConnectionStatus("disconnected"));
-
-    setInterval(() => {
-        if (socket && socket.readyState === WebSocket.OPEN && editorReady) {
-            socket.send(JSON.stringify({
-                type: "code-update",
-                room: roomId,
-                code: getEditorContent()
-            }));
-        }
-    }, 500);
 }
 
 function enterRoom() {
