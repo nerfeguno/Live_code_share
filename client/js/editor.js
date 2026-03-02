@@ -2,6 +2,11 @@ let editor;
 
 function initializeEditor(language = "javascript") {
     return new Promise((resolve) => {
+        if (editor) {
+            editor.dispose();
+            editor = null;
+        }
+
         require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs" } });
         require(["vs/editor/editor.main"], () => {
             editor = monaco.editor.create(document.getElementById("editor"), {
