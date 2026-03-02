@@ -1,97 +1,47 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Live Code Share</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-
-    <link rel="stylesheet" href="./css/app.css" />
-    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <link rel="stylesheet" href="css/app.css" />
+    <script src="js/editor.js" defer></script>
+    <script src="js/main.js" defer></script>
   </head>
   <body>
-    <div id="lobby" class="lobby">
+    <div class="lobby" id="lobby">
       <div class="lobby-card">
         <h1>Live Code Share</h1>
-        <p class="sub">Realtime collaborative editor</p>
-
+        <div class="sub">Collaborate in real-time</div>
         <div class="room-actions">
-          <button id="createRoomBtn">Create new room</button>
-
+          <button id="createRoomBtn">Create Room</button>
           <div class="join-box">
-            <input id="roomInput" placeholder="Enter room code" />
-            <button id="joinRoomBtn">Join</button>
+            <input type="text" id="roomIdInput" placeholder="Enter Room ID" />
+            <button id="joinRoomBtn">Join Room</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="app" class="app hidden">
-      <header class="topbar">
-        <div class="brand">Live Code Share</div>
-
+    <div class="app hidden" id="app">
+      <div class="topbar">
+        <div class="brand">LiveCode</div>
         <div class="controls">
-          <select id="languageSelect"></select>
-          <div id="roomLabel" class="room-label-container"></div>
-          <div id="connectionStatus" class="connection-status connected">
-            <span class="status-dot"></span>
-            <span class="status-text">Connected</span>
+          <select id="languageSelect">
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="c">C</option>
+          </select>
+          <div class="room-label-container" id="roomLabel">
+            Room: <span id="roomIdLabel"></span>
+          </div>
+          <div class="connection-status connecting" id="connectionStatus">
+            <span class="status-dot"></span> Connecting...
           </div>
         </div>
-      </header>
-
-      <main id="editor"></main>
-    </div>
-
-    <div id="shareMenu" class="share-menu">
-      <div class="share-menu-header">
-        <span>Share Room</span>
-        <button class="share-menu-close" onclick="toggleShareMenu()">
-          <i class="fas fa-times"></i>
-        </button>
       </div>
-      <div class="share-menu-body">
-        <div class="share-link-container">
-          <input type="text" id="shareLinkInput" readonly />
-          <button class="share-action-btn" onclick="copyShareLink()">
-            <i class="fas fa-copy"></i> Copy
-          </button>
-        </div>
-
-        <div class="share-options">
-          <button class="share-option" onclick="shareVia('twitter')">
-            <i class="fab fa-twitter"></i> Twitter
-          </button>
-          <button class="share-option" onclick="shareVia('whatsapp')">
-            <i class="fab fa-whatsapp"></i> WhatsApp
-          </button>
-        </div>
-
-        <div class="share-qr">
-          <div class="share-qr-header">
-            <span><i class="fas fa-qrcode"></i> QR Code</span>
-            <button onclick="downloadQR()">
-              <i class="fas fa-download"></i>
-            </button>
-          </div>
-          <div id="qrCodeContainer"></div>
-        </div>
-      </div>
+      <div id="editor"></div>
     </div>
-
-    <div id="peersSidebar" class="peers-sidebar">
-      <div class="peers-header">
-        <i class="fas fa-users"></i> Connected Users (<span id="userCount"
-          >1</span
-        >)
-      </div>
-      <div id="peersList" class="peers-list"></div>
-    </div>
-
-    <script src="./js/editor.js"></script>
-    <script src="./js/main.js"></script>
   </body>
 </html>
