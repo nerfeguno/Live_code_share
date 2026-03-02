@@ -38,7 +38,7 @@ let isRemote = false;
 
 function connect(room) {
 
-    ws = new WebSocket("ws://localhost:8080");
+    ws = new WebSocket("ws://live-code-share-ld0g.onrender.com");
 
     ws.onopen = () => {
         ws.send(JSON.stringify({
