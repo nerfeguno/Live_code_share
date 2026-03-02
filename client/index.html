@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Live Code Share</title>
+
+    <link rel="stylesheet" href="./css/app.css" />
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+  </head>
+  <body>
+    <div id="lobby" class="lobby">
+      <div class="lobby-card">
+        <h1>Live Code Share</h1>
+        <p class="sub">Realtime collaborative editor</p>
+
+        <div class="room-actions">
+          <button id="createRoomBtn">Create new room</button>
+
+          <div class="join-box">
+            <input id="roomInput" placeholder="Enter room code" />
+            <button id="joinRoomBtn">Join</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="app" class="app hidden">
+      <header class="topbar">
+        <div class="brand">Live Code Share</div>
+
+        <div class="controls">
+          <select id="languageSelect"></select>
+          <span id="roomLabel"></span>
+        </div>
+      </header>
+
+      <main id="editor"></main>
+    </div>
+
+    <script src="./js/editor.js"></script>
+    <script src="./js/main.js"></script>
+  </body>
+</html>
