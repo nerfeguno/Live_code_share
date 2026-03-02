@@ -29,7 +29,7 @@ const server = createServer((req, res) => {
             status: "ok",
             timestamp: Date.now(),
             connections: wss.clients.size,
-            rooms: rooms.size
+            rooms: Array.from(rooms.keys()).length
         }));
         return;
     }
@@ -90,11 +90,9 @@ wss.on("connection", (ws, req) => {
     ws.on("close", () => {
         console.log(`Client ${ws.clientId} disconnected from room: ${ws.room}`);
         clearInterval(pingInterval);
-
         if (ws.room && rooms.has(ws.room)) {
             const room = rooms.get(ws.room);
             room.clients.delete(ws.clientId);
-
             broadcastToRoom(ws.room, ws, {
                 type: "peer_left",
                 clientId: ws.clientId,
@@ -119,19 +117,15 @@ function handleMessage(ws, data) {
         case "join":
             handleJoin(ws, data.room);
             break;
-
         case "edit":
             handleEdit(ws, data.text, data.cursor);
             break;
-
         case "cursor":
             handleCursor(ws, data.position);
             break;
-
         case "leave":
             handleLeave(ws);
             break;
-
         default:
             console.log(`Unknown message type: ${data.type}`);
     }
@@ -170,8 +164,6 @@ function handleJoin(ws, roomId) {
     room.clients.add(ws.clientId);
     room.lastAccessed = Date.now();
 
-    console.log(`Client ${ws.clientId} joined room: ${roomId} (${room.clients.size} clients)`);
-
     ws.send(JSON.stringify({
         type: "init",
         text: room.content,
@@ -190,12 +182,10 @@ function handleEdit(ws, text, cursor = null) {
     if (!ws.room || !rooms.has(ws.room)) return;
 
     const room = rooms.get(ws.room);
-
     if (text && text.length > 10 * 1024 * 1024) {
         sendError(ws, "Content too large");
         return;
     }
-
     room.content = text || "";
     room.lastAccessed = Date.now();
 
@@ -221,28 +211,20 @@ function handleLeave(ws) {
     if (ws.room && rooms.has(ws.room)) {
         const room = rooms.get(ws.room);
         room.clients.delete(ws.clientId);
-
         broadcastToRoom(ws.room, ws, {
             type: "peer_left",
             clientId: ws.clientId,
             clients: Array.from(room.clients)
         });
-
         ws.room = null;
     }
 }
 
 function broadcastToRoom(roomId, senderWs, message) {
     if (!rooms.has(roomId)) return;
-
     const messageStr = JSON.stringify(message);
-
     for (const client of wss.clients) {
-        if (
-            client !== senderWs &&
-            client.readyState === 1 &&
-            client.room === roomId
-        ) {
+        if (client !== senderWs && client.readyState === 1 && client.room === roomId) {
             try {
                 client.send(messageStr);
             } catch (error) {
@@ -254,10 +236,7 @@ function broadcastToRoom(roomId, senderWs, message) {
 
 function sendError(ws, message) {
     if (ws.readyState === 1) {
-        ws.send(JSON.stringify({
-            type: "error",
-            message: message
-        }));
+        ws.send(JSON.stringify({ type: "error", message }));
     }
 }
 
