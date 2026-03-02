@@ -4,13 +4,33 @@ import { parse } from "url";
 import crypto from "crypto";
 
 const PORT = process.env.PORT || 8080;
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ||
+    'http://localhost:3000,https://live-code-share-theta.vercel.app').split(',');
 
 const server = createServer((req, res) => {
     const { pathname } = parse(req.url || "");
 
+    const origin = req.headers.origin;
+    if (origin && ALLOWED_ORIGINS.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    }
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
     if (pathname === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ status: "ok", timestamp: Date.now() }));
+        res.end(JSON.stringify({
+            status: "ok",
+            timestamp: Date.now(),
+            connections: wss.clients.size,
+            rooms: rooms.size
+        }));
         return;
     }
 
@@ -18,7 +38,18 @@ const server = createServer((req, res) => {
     res.end();
 });
 
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({
+    server,
+    verifyClient: (info, cb) => {
+        const origin = info.origin;
+        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+            cb(true);
+        } else {
+            console.log('Rejected connection from origin:', origin);
+            cb(false, 403, 'Forbidden');
+        }
+    }
+});
 
 const rooms = new Map();
 const MAX_ROOM_SIZE = 10;
@@ -231,7 +262,19 @@ function sendError(ws, message) {
     }
 }
 
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, closing connections...');
+    wss.clients.forEach((client) => {
+        client.close(1001, 'Server shutting down');
+    });
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
+});
+
 server.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
     console.log(`WebSocket server running at ws://localhost:${PORT}`);
+    console.log(`Allowed origins:`, ALLOWED_ORIGINS);
 });

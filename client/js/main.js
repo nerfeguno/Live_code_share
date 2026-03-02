@@ -20,6 +20,18 @@ function generateRoomCode() {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+function getWebSocketUrl() {
+    if (window.location.hostname === 'live-code-share-theta.vercel.app') {
+        return 'wss://live-code-share-ld0g.onrender.com';
+    }
+
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'ws://localhost:8080';
+    }
+
+    return 'wss://live-code-share-ld0g.onrender.com';
+}
+
 window.copyRoomLink = function () {
     const url = new URL(window.location.href);
     url.searchParams.set("room", currentRoom);
@@ -66,6 +78,7 @@ function generateQRCode(roomCode) {
         qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}" alt="QR Code">`;
     }
 }
+
 window.downloadQR = function () {
     const qrImg = document.querySelector('#qrCodeContainer img');
     if (qrImg) {
@@ -138,7 +151,6 @@ function setConnectionStatus(status) {
     if (connectionStatus) {
         connectionStatus.className = `connection-status ${status}`;
         const textEl = connectionStatus.querySelector('.status-text');
-        const iconEl = connectionStatus.querySelector('i');
 
         if (textEl) {
             textEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
@@ -214,7 +226,8 @@ function connect(room) {
 
     setConnectionStatus('connecting');
 
-    const wsUrl = 'ws://localhost:8080';
+    const wsUrl = getWebSocketUrl();
+    console.log('Connecting to WebSocket:', wsUrl);
 
     ws = new WebSocket(wsUrl);
 
