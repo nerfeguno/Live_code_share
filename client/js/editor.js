@@ -6,7 +6,7 @@ export function initializeEditor(language = "javascript") {
         require(["vs/editor/editor.main"], () => {
             editor = monaco.editor.create(document.getElementById("editor"), {
                 value: "// Start coding here...\n",
-                language: language,
+                language,
                 theme: "vs-dark",
                 automaticLayout: true,
                 fontSize: 14,

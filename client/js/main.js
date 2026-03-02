@@ -1,4 +1,4 @@
-import { initializeEditor, setEditorLanguage, getEditorContent, setEditorContent } from "./editor.js";
+import { initializeEditor, setEditorLanguage, getEditorContent, setEditorContent } from './editor.js';
 
 let socket;
 let roomId = null;
