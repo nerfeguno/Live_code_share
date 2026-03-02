@@ -30,6 +30,10 @@ function startApp(room) {
 
     createEditor();
     connect(room);
+
+    const editor = getEditor();
+    const saved = localStorage.getItem("room_" + room);
+    if (saved) editor.setValue(saved);
 }
 
 
@@ -78,9 +82,13 @@ function connect(room) {
 
             if (isRemote) return;
 
+            const content = editor.getValue();
+
+            localStorage.setItem("room_" + room, content);
+
             ws.send(JSON.stringify({
                 type: "edit",
-                text: editor.getValue()
+                text: content
             }));
 
         });
