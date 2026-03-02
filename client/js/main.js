@@ -1,5 +1,8 @@
+import { initializeEditor, setEditorLanguage, getEditorContent, setEditorContent } from "./editor.js";
+
 let socket;
 let roomId = null;
+let editorReady = false;
 
 const lobby = document.getElementById("lobby");
 const app = document.getElementById("app");
@@ -11,51 +14,56 @@ const languageSelect = document.getElementById("languageSelect");
 document.getElementById("createRoomBtn").addEventListener("click", createRoom);
 document.getElementById("joinRoomBtn").addEventListener("click", joinRoom);
 languageSelect.addEventListener("change", () => {
-    Editor.setEditorLanguage(languageSelect.value);
+    setEditorLanguage(languageSelect.value);
 });
 
-function createRoom() {
+async function createRoom() {
     socket = new WebSocket("wss://live-code-share-ld0g.onrender.com");
+    await setupEditorAndSocket();
     socket.addEventListener("open", () => {
         socket.send(JSON.stringify({ type: "create" }));
     });
-    setupSocket();
 }
 
-function joinRoom() {
+async function joinRoom() {
     roomId = roomIdInput.value.trim();
     if (!roomId) return alert("Enter Room ID");
-    socket = new WebSocket("ws://localhost:3000");
+    socket = new WebSocket("wss://live-code-share-ld0g.onrender.com");
+    await setupEditorAndSocket();
     socket.addEventListener("open", () => {
         socket.send(JSON.stringify({ type: "join", room: roomId }));
     });
-    setupSocket();
 }
 
-function setupSocket() {
+async function setupEditorAndSocket() {
+    if (!editorReady) {
+        await initializeEditor(languageSelect.value);
+        editorReady = true;
+    }
+
     socket.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
         if (data.type === "room-created") {
             roomId = data.room;
             enterRoom();
         } else if (data.type === "room-joined") {
+            roomId = data.room;
             enterRoom();
-        } else if (data.type === "code-update" && data.sender !== socket.id) {
-            Editor.setEditorContent(data.code);
+        } else if (data.type === "code-update") {
+            setEditorContent(data.code);
         }
     });
 
-    socket.addEventListener("open", () => {
-        updateConnectionStatus("connected");
-    });
-    socket.addEventListener("close", () => {
-        updateConnectionStatus("disconnected");
-    });
+    socket.addEventListener("open", () => updateConnectionStatus("connected"));
+    socket.addEventListener("close", () => updateConnectionStatus("disconnected"));
 
-    Editor.initializeEditor(languageSelect.value);
-    Editor.getEditorContent && setInterval(() => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({ type: "code-update", room: roomId, code: Editor.getEditorContent(), sender: socket.id }));
+    setInterval(() => {
+        if (socket && socket.readyState === WebSocket.OPEN && editorReady) {
+            socket.send(JSON.stringify({
+                type: "code-update",
+                room: roomId,
+                code: getEditorContent()
+            }));
         }
     }, 500);
 }
