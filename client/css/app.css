@@ -281,3 +281,31 @@ html, body {
   .peers-sidebar { width: 100%; top: 60px; }
   .share-menu { width: 90%; }
 }
+
+
+#exitBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #7f1d1d;
+  background: linear-gradient(135deg, #991b1b, #7f1d1d);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#exitBtn:hover {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);
+  transform: translateY(-1px);
+}
+
+#exitBtn:active {
+  transform: scale(0.95);
+}
+
+#exitBtn:focus {
+  outline: none;
+  border-color: #ef4444;
+}

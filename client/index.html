@@ -3,14 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Live Code Share</title>
-    <link rel="stylesheet" href="css/app.css" />
 
+    <title>Live Code Share - Real-time Collaborative Code Editor</title>
+    <meta
+      name="description"
+      content="Collaborate in real-time on code with your team. Supports JavaScript, Python, C++, and more."
+    />
+    <meta
+      name="keywords"
+      content="live code share, collaborative coding, online code editor, real-time coding"
+    />
+    <meta name="robots" content="index, follow" />
+
+    <link rel="icon" href="src/code.svg" type="image/x-icon" />
+
+    <meta
+      property="og:title"
+      content="Live Code Share - Real-time Collaborative Code Editor"
+    />
+    <meta
+      property="og:description"
+      content="Collaborate in real-time on code with your team. Supports JavaScript, Python, C++, and more."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://live-code-share-theta.vercel.app/"
+    />
+    <meta
+      property="og:image"
+      content="https://live-code-share-theta.vercel.app/src/code.svg"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Live Code Share" />
+    <meta
+      name="twitter:description"
+      content="Collaborate in real-time on code with your team."
+    />
+    <meta
+      name="twitter:image"
+      content="https://live-code-share-theta.vercel.app/src/code.svg"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Live Code Share",
+        "url": "https://live-code-share-theta.vercel.app",
+        "description": "Collaborate in real-time on code with your team. Supports JavaScript, Python, C++, and more."
+      }
+    </script>
+
+    <link rel="stylesheet" href="css/app.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js"></script>
+
+    <script src="https://unpkg.com/yjs"></script>
+    <script src="https://unpkg.com/y-websocket"></script>
+    <script src="https://unpkg.com/y-monaco"></script>
 
     <script src="js/editor.js" defer></script>
     <script src="js/main.js" defer></script>
   </head>
+
   <body>
     <div class="lobby" id="lobby">
       <div class="lobby-card">
@@ -28,22 +84,44 @@
 
     <div class="app hidden" id="app">
       <div class="topbar">
-        <div class="brand">LiveCode</div>
+        <div class="brand">Live Code Share</div>
         <div class="controls">
           <select id="languageSelect">
             <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
             <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="csharp">C#</option>
+            <option value="go">Go</option>
+            <option value="rust">Rust</option>
+            <option value="php">PHP</option>
+            <option value="ruby">Ruby</option>
+            <option value="swift">Swift</option>
+            <option value="kotlin">Kotlin</option>
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="json">JSON</option>
+            <option value="yaml">YAML</option>
+            <option value="markdown">Markdown</option>
+            <option value="sql">SQL</option>
+            <option value="shell">Shell</option>
+            <option value="powershell">PowerShell</option>
           </select>
+
           <div class="room-label-container" id="roomLabel">
             Room: <span id="roomIdLabel"></span>
           </div>
+
           <div class="connection-status connecting" id="connectionStatus">
             <span class="status-dot"></span> Connecting...
           </div>
+
+          <button id="exitBtn">Exit Room</button>
         </div>
       </div>
+
       <div id="editor"></div>
     </div>
   </body>

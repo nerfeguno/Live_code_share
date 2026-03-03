@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://live-code-share-theta.vercel.app/sitemap.xml
