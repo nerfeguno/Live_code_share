@@ -2,7 +2,9 @@
   "name": "live-code-share-server",
   "version": "1.0.0",
   "type": "module",
-  "start": "node server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "ws": "^8.14.0",
     "y-websocket": "^1.5.0",

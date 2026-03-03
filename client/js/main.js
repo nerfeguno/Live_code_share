@@ -1,6 +1,6 @@
-import * as Y from "yjs";
-import { WebsocketProvider } from "y-websocket";
-import { MonacoBinding } from "y-monaco";
+import * as Y from "https://esm.sh/yjs@13.6.8";
+import { WebsocketProvider } from "https://esm.sh/y-websocket@1.5.0?deps=yjs@13.6.8";
+import { MonacoBinding } from "https://esm.sh/y-monaco@0.1.6?deps=yjs@13.6.8";
 
 let roomId = null;
 let ydoc = null;
@@ -21,7 +21,6 @@ document.getElementById("exitBtn").addEventListener("click", exitRoom);
 languageSelect.addEventListener("change", () => {
     const lang = languageSelect.value;
     Editor.setEditorLanguage(lang);
-    // Sync language choice to other users via Awareness
     if (provider) {
         provider.awareness.setLocalStateField("language", lang);
     }
@@ -51,10 +50,10 @@ async function joinRoomById(id) {
     roomId = id;
     localStorage.setItem("roomId", roomId);
 
-    // 1. Initialize Monaco Editor
+
     await Editor.initializeEditor(languageSelect.value);
 
-    // 2. Setup Yjs
+
     ydoc = new Y.Doc();
     const WS_URL = location.hostname === "localhost"
         ? "ws://localhost:1234"
@@ -62,7 +61,7 @@ async function joinRoomById(id) {
 
     provider = new WebsocketProvider(WS_URL, roomId, ydoc);
 
-    // 3. Bind Yjs to Monaco
+
     const yText = ydoc.getText("monaco");
     binding = new MonacoBinding(
         yText,
@@ -71,11 +70,10 @@ async function joinRoomById(id) {
         provider.awareness
     );
 
-    // 4. Handle Language Syncing via Awareness
     provider.awareness.on("change", () => {
         const states = Array.from(provider.awareness.getStates().values());
-        const remoteState = states.find(s => s.language);
-        if (remoteState && remoteState.language !== languageSelect.value) {
+        const remoteState = states.find(s => s.language && s.language !== languageSelect.value);
+        if (remoteState) {
             Editor.setEditorLanguage(remoteState.language);
             languageSelect.value = remoteState.language;
         }
@@ -94,7 +92,7 @@ function exitRoom() {
     if (ydoc) ydoc.destroy();
 
     localStorage.removeItem("roomId");
-    location.reload(); // Cleanest way to reset the editor state
+    location.reload();
 }
 
 function enterRoom() {
@@ -104,6 +102,7 @@ function enterRoom() {
 }
 
 function updateConnectionStatus(status) {
-    connectionStatus.className = "connection-status " + status;
-    connectionStatus.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+    connectionStatus.className = `connection-status ${status}`;
+    const text = status.charAt(0).toUpperCase() + status.slice(1);
+    connectionStatus.textContent = text;
 }

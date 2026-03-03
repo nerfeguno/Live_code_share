@@ -2,7 +2,7 @@ let editor = null;
 
 const Editor = {
     initializeEditor: async (language = "javascript") => {
-        if (editor) return; // Prevent multiple instances
+        if (editor) return;
         return new Promise((resolve) => {
             require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs" } });
             require(["vs/editor/editor.main"], () => {
@@ -27,3 +27,5 @@ const Editor = {
 
     getEditorInstance: () => editor,
 };
+
+window.Editor = Editor;

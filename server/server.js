@@ -1,6 +1,5 @@
 import { WebSocketServer } from "ws";
 import { createServer } from "http";
-// @ts-ignore
 import { setupWSConnection } from "y-websocket/bin/utils";
 
 const PORT = process.env.PORT || 1234;
@@ -18,12 +17,10 @@ const server = createServer((req, res) => {
 const wss = new WebSocketServer({ server });
 
 wss.on("connection", (conn, req) => {
-    // This utility handles all the Yjs syncing, room management,
-    // and conflict resolution automatically.
     setupWSConnection(conn, req);
     console.log("New connection established via Yjs");
 });
 
 server.listen(PORT, () => {
-    console.log(`Yjs Relay Server running on port ${PORT}`);
+    console.log(`✅ Yjs Relay Server running on port ${PORT}`);
 });

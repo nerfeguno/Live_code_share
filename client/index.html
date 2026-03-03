@@ -59,19 +59,15 @@
     <link rel="stylesheet" href="css/app.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.43.0/min/vs/loader.min.js"></script>
 
-    <script src="https://unpkg.com/yjs"></script>
-    <script src="https://unpkg.com/y-websocket"></script>
-    <script src="https://unpkg.com/y-monaco"></script>
-
     <script src="js/editor.js" defer></script>
-    <script src="js/main.js" defer></script>
+    <script type="module" src="js/main.js"></script>
   </head>
 
   <body>
     <div class="lobby" id="lobby">
       <div class="lobby-card">
         <h1>Live Code Share</h1>
-        <div class="sub">Collaborate in real-time data</div>
+        <div class="sub">Collaborate in real-time on code</div>
         <div class="room-actions">
           <button id="createRoomBtn">Create Room</button>
           <div class="join-box">
