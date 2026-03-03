@@ -1,20 +1,16 @@
 import http from "http";
 import { WebSocketServer } from "ws";
-import { setupWSConnection } from "y-websocket/bin/utils.js";
+import { setupWSConnection } from "y-websocket";
 import { parse } from "url";
 
 const PORT = process.env.PORT || 8080;
 
 /**
- * HTTP SERVER
- * Used for:
- * - Health checks
- * - CORS handling
+ * HTTP SERVER (health + CORS)
  */
 const server = http.createServer((req, res) => {
     const { pathname } = parse(req.url || "");
 
-    // Allow cross-origin requests
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -25,7 +21,6 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Health endpoint (useful for deployment platforms)
     if (pathname === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(
@@ -44,18 +39,13 @@ const server = http.createServer((req, res) => {
 });
 
 /**
- * WEBSOCKET SERVER
- * Handles Yjs document synchronization
+ * WEBSOCKET SERVER (Yjs)
  */
 const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws, req) => {
     console.log("Client connected");
 
-    // This handles:
-    // - Room separation (by URL path)
-    // - CRDT sync
-    // - Awareness (cursor, metadata)
     setupWSConnection(ws, req);
 
     ws.on("close", () => {
@@ -64,7 +54,7 @@ wss.on("connection", (ws, req) => {
 });
 
 /**
- * START SERVER
+ * START
  */
 server.listen(PORT, () => {
     console.log(`Yjs WebSocket server running on port ${PORT}`);
