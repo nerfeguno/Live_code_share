@@ -58,7 +58,7 @@ async function joinRoomById(id) {
     ydoc = new Y.Doc();
     const WS_URL = location.hostname === "localhost"
         ? "ws://localhost:1234"
-        : "wss://your-production-url.com";
+        : "wss://live-code-share-ld0g.onrender.com";
 
     provider = new WebsocketProvider(WS_URL, roomId, ydoc);
 
