@@ -1,61 +1,29 @@
-import http from "http";
 import { WebSocketServer } from "ws";
-import { setupWSConnection } from "y-websocket";
-import { parse } from "url";
+import { createServer } from "http";
+// @ts-ignore
+import { setupWSConnection } from "y-websocket/bin/utils";
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 1234;
 
-/**
- * HTTP SERVER (health + CORS)
- */
-const server = http.createServer((req, res) => {
-    const { pathname } = parse(req.url || "");
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    if (req.method === "OPTIONS") {
-        res.writeHead(204);
-        res.end();
-        return;
-    }
-
-    if (pathname === "/health") {
+const server = createServer((req, res) => {
+    if (req.url === "/health") {
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(
-            JSON.stringify({
-                status: "ok",
-                clients: wss.clients.size,
-                uptime: process.uptime(),
-                timestamp: Date.now(),
-            })
-        );
+        res.end(JSON.stringify({ status: "ok", time: Date.now() }));
         return;
     }
-
     res.writeHead(404);
     res.end();
 });
 
-/**
- * WEBSOCKET SERVER (Yjs)
- */
 const wss = new WebSocketServer({ server });
 
-wss.on("connection", (ws, req) => {
-    console.log("Client connected");
-
-    setupWSConnection(ws, req);
-
-    ws.on("close", () => {
-        console.log("Client disconnected");
-    });
+wss.on("connection", (conn, req) => {
+    // This utility handles all the Yjs syncing, room management,
+    // and conflict resolution automatically.
+    setupWSConnection(conn, req);
+    console.log("New connection established via Yjs");
 });
 
-/**
- * START
- */
 server.listen(PORT, () => {
-    console.log(`Yjs WebSocket server running on port ${PORT}`);
+    console.log(`Yjs Relay Server running on port ${PORT}`);
 });
